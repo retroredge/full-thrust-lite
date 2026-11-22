@@ -1,0 +1,1261 @@
+:root {
+  --bg: #080b14;
+  --panel: #0f1422;
+  --panel-raised: #161c2e;
+  --line: #26304a;
+  --text: #dbe3f4;
+  --muted: #8794b0;
+  --accent: #5b9dff;
+  --accent-strong: #2f7bf0;
+  --danger: #ff7a6b;
+  /* Ships out of reach of every enemy, about to leave the battle. */
+  --leaving: #f0b040;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font:
+    13px/1.4 system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    'toolbar toolbar'
+    'map side';
+  height: 100vh;
+}
+
+h1,
+h2 {
+  margin: 0;
+  font-weight: 600;
+}
+
+h1 {
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+h2 {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+button,
+.button,
+select {
+  font: inherit;
+  color: var(--text);
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+
+button,
+.button {
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* A link that looks like a button, such as Rules, which opens the rules PDF. */
+.button {
+  display: inline-block;
+  text-decoration: none;
+}
+
+button:hover:not(:disabled),
+.button:hover {
+  border-color: var(--accent);
+}
+
+button:disabled,
+select:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: #fff;
+  font-weight: 600;
+}
+
+button:focus-visible,
+.button:focus-visible,
+select:focus-visible,
+tr:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--line);
+}
+
+.toolbar-group {
+  display: flex;
+  gap: 6px;
+}
+
+.toolbar-spacer {
+  flex: 1;
+}
+
+.turn-status {
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.turn-status strong {
+  color: var(--text);
+}
+
+.map-area {
+  grid-area: map;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+#map {
+  /* Taken out of the flow so the canvas's pixel size can never stretch the layout. */
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+#map.dragging {
+  cursor: grabbing;
+}
+
+/*
+ * The course clock floats in the top-right corner of the Movement orders
+ * panel while plotting, beside the heading and the first two order rows
+ * (Now and Thrust), which are short. It is sized to end where the third row
+ * starts, and the rows from the third on clear it, so the panel is no taller
+ * than without it and the SSD above keeps its room.
+ */
+.course-clock {
+  float: right;
+  width: 90px;
+  height: 90px;
+  margin-left: 8px;
+}
+
+.course-clock[hidden] {
+  display: none;
+}
+
+.course-clock svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.message {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 80%;
+  padding: 8px 12px;
+  background: #3a1616;
+  border: 1px solid var(--danger);
+  border-radius: 6px;
+  white-space: pre-wrap;
+}
+
+.side {
+  grid-area: side;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.panel {
+  padding: 10px 12px;
+}
+
+.ssd-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  background-color: var(--panel);
+  transition: background-color 0.2s ease;
+}
+
+/* A faint wash of the selected ship's player colour. */
+.ssd-panel[data-player] {
+  background-color: color-mix(in srgb, var(--player-colour) 24%, var(--panel));
+}
+
+.empty {
+  color: var(--muted);
+}
+
+/* Movement orders for the selected ship */
+
+/* Port / no turn / starboard: real radio buttons drawn as a segmented control. */
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.segmented label {
+  position: relative;
+  cursor: pointer;
+}
+
+.segmented label + label {
+  border-left: 1px solid var(--line);
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.segmented span {
+  display: inline-block;
+  min-width: 34px;
+  padding: 3px 0;
+  text-align: center;
+  font-weight: 600;
+  background: var(--panel-raised);
+  color: var(--muted);
+}
+
+.segmented label:hover span {
+  color: var(--text);
+}
+
+.segmented input:checked + span {
+  background: var(--accent-strong);
+  color: #fff;
+}
+
+.segmented input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.segmented input:disabled + span {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ship-nav {
+  clear: both;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ship-nav[hidden] {
+  display: none;
+}
+
+.ship-nav button {
+  flex: 1;
+}
+
+.orders-panel {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--line);
+}
+
+/* Block, not grid, so the rows can flow beside the floating course clock. */
+#orders {
+  font-variant-numeric: tabular-nums;
+}
+
+#orders > * + * {
+  margin-top: 6px;
+}
+
+#orders > :nth-child(n + 3) {
+  clear: right;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.order-label {
+  color: var(--muted);
+}
+
+.leaving-note {
+  color: var(--leaving);
+}
+
+.order-value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.order-value select {
+  padding: 3px 4px;
+}
+
+.vc-pair {
+  white-space: pre;
+  color: var(--muted);
+}
+
+.vc-pair strong {
+  color: var(--text);
+}
+
+.vc-pair.changed strong {
+  color: #ffd479;
+}
+
+.order-text {
+  font-weight: 600;
+}
+
+.secret {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+/* SSD */
+
+.ssd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.ssd-title {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.ssd-class {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
+
+.ssd-card {
+  /* No background of its own, so the panel's player colour shows around the ship. */
+  padding: 10px;
+}
+
+/*
+ * Each SSD is drawn at its natural size in pixels (`--ssd-height`, set on the
+ * SVG), so the icons are the same size on every ship and a battlecruiser looks
+ * bigger than a frigate. When the panel is too short for the largest SSD
+ * (474 px with its margin), every SSD shrinks by the same factor, so the
+ * classes stay in proportion.
+ */
+.ssd-card svg {
+  --ssd-room: max(240px, calc(100vh - 395px));
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 100%;
+  height: min(calc(var(--ssd-height) * 1px), calc(var(--ssd-room) * var(--ssd-height) / 474));
+}
+
+/* Lock in button: drawn in the plotting player's colour. */
+
+#execute {
+  background: var(--lock-colour, var(--accent-strong));
+  border-color: var(--lock-colour, var(--accent-strong));
+  color: #0b0f1a;
+}
+
+#execute:disabled {
+  background: var(--panel-raised);
+  border-color: var(--line);
+  color: var(--muted);
+}
+
+/* Phase dialogs */
+
+.game-dialog {
+  --dialog-accent: var(--accent);
+  min-width: 340px;
+  max-width: min(460px, calc(100vw - 32px));
+  padding: 0;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--dialog-accent);
+  border-radius: 10px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.55);
+}
+
+/* A light dim: the board stays visible behind the dialog. */
+.game-dialog::backdrop {
+  background: rgba(4, 6, 12, 0.45);
+}
+
+.game-dialog[open] {
+  animation: dialog-in 0.16s ease-out;
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.game-dialog form {
+  padding: 22px 24px 18px;
+}
+
+.game-dialog .dialog-eyebrow {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.game-dialog .dialog-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 20px;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.game-dialog .dialog-subtitle {
+  margin: 6px 0 0;
+  color: var(--dialog-accent);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.game-dialog .dialog-message {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* A warning under the message, e.g. ships leaving the battle. */
+.game-dialog .dialog-note {
+  color: var(--leaving);
+}
+
+.game-dialog .dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.game-dialog .dialog-actions button {
+  min-width: 96px;
+  padding: 7px 14px;
+}
+
+.game-dialog .dialog-actions button.primary {
+  background: var(--dialog-accent);
+  border-color: var(--dialog-accent);
+  color: #0b0f1a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-dialog[open] {
+    animation: none;
+  }
+}
+
+/* Intro screen: the scenario list, over the starfield. */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: radial-gradient(ellipse at center, rgba(5, 7, 15, 0.35), rgba(5, 7, 15, 0.8));
+}
+
+.intro[hidden] {
+  display: none;
+}
+
+.intro-card {
+  width: min(460px, 100%);
+  padding: 28px 28px 22px;
+  background: rgba(15, 20, 34, 0.94);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--accent);
+  border-radius: 12px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+}
+
+.intro-heading {
+  font-size: 28px;
+  letter-spacing: 0.04em;
+}
+
+.intro-tagline {
+  margin: 4px 0 22px;
+  color: var(--muted);
+}
+
+.intro-list {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.intro-option {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--panel-raised);
+  cursor: pointer;
+}
+
+.intro-option:hover {
+  border-color: var(--accent);
+}
+
+/* Real radio buttons, hidden behind the styled rows. */
+.intro-option input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+}
+
+.intro-option:has(input:checked) {
+  border-color: var(--accent);
+  background: rgba(47, 123, 240, 0.22);
+}
+
+.intro-option:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.intro-number {
+  min-width: 1.6em;
+  color: var(--muted);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.intro-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.intro-description {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--bg);
+}
+
+.intro-selected-title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.intro-text {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.5;
+  /* Long descriptions scroll here, about 8 lines, so the title, forces and
+     Play button stay put. */
+  max-height: 12em;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.intro-forces-heading {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.intro-summary {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  word-spacing: 0.15em;
+}
+
+.intro-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.intro-play {
+  min-width: 120px;
+  padding: 9px 18px;
+  font-size: 15px;
+}
+
+/* ----- Weapons fire ----- */
+
+.game-dialog .dialog-detail {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+/* Dice with pips */
+
+.die {
+  --die-colour: #f4f1e8;
+  display: inline-block;
+  flex: none;
+}
+
+.die-face {
+  fill: var(--die-colour);
+  stroke: rgba(0, 0, 0, 0.55);
+  stroke-width: 1.5;
+}
+
+.die-pip {
+  fill: #11131a;
+}
+
+.die-miss {
+  --die-colour: #8b92a3;
+  opacity: 0.75;
+}
+
+.die-hit {
+  --die-colour: #ffc24b;
+}
+
+.die-double {
+  --die-colour: #ff5f45;
+}
+
+.die-double .die-pip {
+  fill: #fff;
+}
+
+.die-rolling .die-body {
+  animation: die-tumble 0.9s linear infinite;
+  transform-origin: 20px 20px;
+}
+
+/* While rolling, the result colours aren't known yet. */
+.fire-dice-group.rolling .die {
+  --die-colour: #f4f1e8;
+  opacity: 1;
+}
+
+.fire-dice-group.rolling .die-pip {
+  fill: #11131a;
+}
+
+@keyframes die-tumble {
+  0% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(180deg) translateY(-3px);
+  }
+  100% {
+    transform: rotate(360deg) translateY(0);
+  }
+}
+
+/* Initiative */
+
+.initiative {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.initiative-round {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.initiative-tied {
+  opacity: 0.55;
+}
+
+.initiative-roll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.initiative-note {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.initiative-winner {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.initiative-first {
+  margin: 4px 0 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Targeting: the target's column beside the firing ship's panel */
+
+#app.targeting {
+  grid-template-columns: minmax(0, 1fr) 320px 320px;
+  grid-template-areas:
+    'toolbar toolbar toolbar'
+    'map target side';
+}
+
+.target-side {
+  grid-area: target;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.target-side[hidden] {
+  display: none;
+}
+
+.target-ssd-card {
+  position: relative;
+}
+
+.target-fired {
+  margin: 4px 0 0;
+  text-align: center;
+  font-weight: 600;
+}
+
+.target-fired:empty {
+  display: none;
+}
+
+/* Under the target's SSD: where the dice roll. A fixed height, so the SSD above doesn't jump. */
+.target-outcome {
+  flex: 0 0 auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 190px;
+  border-top: 1px solid var(--line);
+}
+
+.target-outcome h2 {
+  margin-bottom: 0;
+}
+
+/* Under the firing ship's SSD: the dice pool, target buttons and Fire! */
+.targeting {
+  display: grid;
+  gap: 10px;
+}
+
+.targeting-meta {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.targeting-meta strong {
+  color: var(--text);
+}
+
+.targeting-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* With both pools showing, Prev and Next wrap below them, kept to the right. */
+.targeting-row .fire-target-nav {
+  margin-left: auto;
+}
+
+/* The beam dice pool and, when torpedoes bear, the torpedo pool beside it. */
+.dice-pools {
+  display: flex;
+  gap: 6px;
+}
+
+.dice-pool[hidden] {
+  display: none;
+}
+
+.torpedo-pool .dice-pool-unit {
+  font-size: 12px;
+}
+
+/* Beside the dice pool: the target count above the Prev and Next buttons. */
+.targeting-row .fire-target-nav {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-items: center;
+  gap: 4px 6px;
+}
+
+.targeting-row .fire-target-count {
+  grid-column: 1 / -1;
+  grid-row: 1;
+}
+
+.targeting-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* Fire! (and Next target / Continue after a volley) takes focus as soon as a
+   target is shown, so Enter or Space presses it. Show the ring even when a
+   mouse click led here, where the browser would otherwise hide it. White,
+   so it stands out against the blue Fire! button. */
+.targeting-actions button:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.fire-target-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.fire-target-nav[hidden] {
+  display: none;
+}
+
+.fire-target-step {
+  padding: 3px 8px;
+}
+
+.fire-target-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ssd-destroyed svg {
+  animation: ssd-destroyed 0.6s ease-out;
+  filter: grayscale(0.6) brightness(0.8);
+}
+
+@keyframes ssd-destroyed {
+  0% {
+    filter: brightness(2.2) sepia(1) hue-rotate(-30deg);
+  }
+}
+
+.destroyed-stamp {
+  position: absolute;
+  top: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-14deg);
+  padding: 4px 14px;
+  border: 3px solid #ff5f45;
+  border-radius: 6px;
+  color: #ff5f45;
+  background: rgba(10, 10, 10, 0.75);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ssd-boom-shape {
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.dice-pool {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+  align-items: baseline;
+  column-gap: 6px;
+  flex: none;
+  padding: 6px 14px 8px;
+  border: 1px solid var(--dialog-accent);
+  border-radius: 8px;
+  background: var(--panel-raised);
+}
+
+.dice-pool-label {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.dice-pool-number {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dice-pool-unit {
+  color: var(--muted);
+}
+
+.dice-pool-empty {
+  border-color: var(--line);
+  opacity: 0.6;
+}
+
+.fire-hint {
+  margin: 0;
+  color: var(--muted);
+}
+
+.fire-hint:empty {
+  display: none;
+}
+
+.fire-dice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 22px;
+}
+
+.fire-dice:empty {
+  display: none;
+}
+
+.fire-dice-group {
+  display: grid;
+  gap: 4px;
+}
+
+.fire-dice-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fire-dice-row {
+  display: flex;
+  gap: 6px;
+}
+
+.fire-result {
+  margin: 0;
+  font-size: 15px;
+}
+
+.fire-result:empty {
+  display: none;
+}
+
+.fire-destroyed {
+  color: #ff5f45;
+  font-weight: 700;
+}
+
+/* Weapons on the SSD during the fire phase */
+
+.ssd-weapon-ring {
+  display: none;
+  stroke: #ffd65c;
+}
+
+.ssd-weapon-fired,
+.ssd-weapon-unavailable {
+  opacity: 0.3;
+}
+
+/* While targeting: beams that can fire have a dashed ring, chosen ones a solid ring. */
+.ssd-weapon-available,
+.ssd-weapon-selected {
+  cursor: pointer;
+  outline: none;
+}
+
+.ssd-weapon-available .ssd-weapon-ring {
+  display: inline;
+  stroke-dasharray: 1.4 1;
+  opacity: 0.75;
+}
+
+.ssd-weapon-selected .ssd-weapon-ring {
+  display: inline;
+}
+
+.ssd-weapon-available .ssd-weapon-badge {
+  opacity: 0.55;
+}
+
+.ssd-weapon-available:hover .ssd-weapon-ring {
+  opacity: 1;
+}
+
+.ssd-weapon:focus-visible .ssd-weapon-ring {
+  display: inline;
+  stroke: var(--accent);
+  stroke-dasharray: none;
+  opacity: 1;
+}
+
+/*
+ * Systems knocked out by a threshold check keep their colours and get a red
+ * cross. Fading is kept for weapons fired this turn, so the two don't look
+ * alike.
+ */
+.ssd-lost .ssd-weapon-ring,
+.ssd-lost .ssd-weapon-badge {
+  display: none;
+}
+
+/* The cross already says it can't fire; don't fade it while targeting. */
+.ssd-lost.ssd-weapon-unavailable {
+  opacity: 1;
+}
+
+.ssd-cross {
+  stroke: #e0362c;
+}
+
+/* The system being checked in a threshold check: a dotted yellow ring, pulsed from code. */
+.ssd-checking-ring {
+  fill: none;
+  stroke: #ffd84a;
+  stroke-linecap: round;
+}
+
+/* Threshold check results, under the target's dice. */
+.threshold {
+  display: grid;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.threshold[hidden] {
+  display: none;
+}
+
+.threshold-heading {
+  margin: 0;
+  font-size: 13px;
+}
+
+.threshold-heading strong {
+  color: #ff6a52;
+}
+
+/* Three rows (24 px dice, 3 px gaps) show at once, so the target's SSD above keeps its room; the current row scrolls into view. */
+.threshold-list {
+  display: grid;
+  gap: 3px;
+  max-height: 78px;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.threshold-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 84px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+/* While a die is rolling, its colour doesn't give the result away. */
+.threshold-row.rolling .die {
+  --die-colour: #f4f1e8;
+}
+
+.threshold-row.rolling .die-pip {
+  fill: #11131a;
+}
+
+.threshold-verdict {
+  color: var(--muted);
+}
+
+.threshold-lost .threshold-verdict,
+.threshold-outcome.threshold-lost {
+  color: #ff5f45;
+  font-weight: 700;
+}
+
+.threshold-outcome {
+  margin: 0;
+  font-size: 13px;
+}
+
+.threshold-outcome:empty {
+  display: none;
+}
+
+/* Weapons fire panel */
+
+.fire-weapons {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.fire-weapon {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fire-weapon-status {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.fire-weapon-ready .fire-weapon-status {
+  color: #ffd65c;
+}
+
+.fire-weapon-fired,
+.fire-weapon-unused {
+  opacity: 0.5;
+}
+
+.fire-prompt {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .die-rolling .die-body,
+  .ssd-destroyed svg {
+    animation: none;
+  }
+}
+
+/* Temporary sound effects window */
+
+.sound-board {
+  max-width: min(640px, calc(100vw - 32px));
+}
+
+.sound-board form {
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.sound-group {
+  margin-top: 16px;
+}
+
+.sound-group-title {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sound-group-note {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.sound-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sound-button {
+  padding: 5px 10px;
+}

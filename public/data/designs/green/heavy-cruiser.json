@@ -1,0 +1,19 @@
+{
+  "id": "heavy-cruiser",
+  "fleet": "green",
+  "className": "Heavy Cruiser",
+  "code": "CH",
+  "sprite": "ships/CH-green.png",
+  "length": 4.95,
+  "drives": [{ "thrust": 2 }, { "thrust": 2 }],
+  "hullRows": [6, 6, 5, 5],
+  "fireControls": 2,
+  "weapons": [
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "FS"] },
+    { "type": "beam", "class": 3, "arcs": ["FP", "F", "AP"] },
+    { "type": "beam", "class": 3, "arcs": ["F", "FS", "AS"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 4, "weaponRows": [1, 2, 2] }
+}

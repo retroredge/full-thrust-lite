@@ -1,0 +1,19 @@
+{
+  "id": "light-cruiser",
+  "fleet": "red",
+  "className": "Light Cruiser",
+  "code": "CL",
+  "sprite": "ships/CL-red.png",
+  "length": 3.75,
+  "drives": [{ "thrust": 3 }, { "thrust": 3 }],
+  "hullRows": [3, 3, 3, 3],
+  "fireControls": 2,
+  "weapons": [
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "FS"] },
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "AP"] },
+    { "type": "beam", "class": 2, "arcs": ["F", "FS", "AS"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 3, "weaponRows": [1, 2, 2] }
+}

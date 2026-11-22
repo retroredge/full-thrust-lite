@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Thrust Light</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="toolbar">
+        <h1>Full Thrust Light</h1>
+        <button id="menu" type="button" title="Leave this game and choose another scenario">Menu</button>
+        <button id="resign" type="button" title="Concede the game: the other side wins">Resign</button>
+        <div class="toolbar-group">
+          <button id="fit-all" type="button" title="Zoom out to show every ship">Fit all</button>
+          <button id="zoom-out" type="button" title="Zoom out" aria-label="Zoom out">−</button>
+          <button id="zoom-in" type="button" title="Zoom in" aria-label="Zoom in">+</button>
+        </div>
+        <a id="rules" class="button" href="https://downloads.groundzerogames.co.uk/FT0916_UK.pdf" target="_blank" rel="noopener noreferrer" title="Open the Full Thrust Light rules (PDF) in a new tab">Rules</a>
+        <button id="debug" type="button" title="Development only: sound effects and the game state as JSON">Debug</button>
+        <div class="toolbar-spacer"></div>
+        <div id="turn-status" class="turn-status" aria-live="polite"></div>
+        <button id="execute" class="primary" type="button">Lock in orders</button>
+      </header>
+
+      <main class="map-area">
+        <canvas id="map" aria-label="Game map"></canvas>
+        <div id="message" class="message" role="alert" hidden></div>
+      </main>
+
+      <aside id="target-side" class="target-side" aria-label="Target" hidden></aside>
+
+      <aside class="side">
+        <section id="ssd-panel" class="panel ssd-panel">
+          <h2>Ship systems</h2>
+          <div id="ssd"></div>
+        </section>
+        <section class="panel orders-panel" aria-labelledby="orders-heading">
+          <div id="course-clock" class="course-clock" aria-hidden="true" hidden></div>
+          <h2 id="orders-heading">Movement orders</h2>
+          <div id="orders"></div>
+          <div id="ship-nav" class="ship-nav">
+            <button id="prev-ship" type="button" title="Select the previous ship">◀ Prev ship</button>
+            <button id="next-ship" type="button" title="Select the next ship">Next ship ▶</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+    <div id="intro" class="intro" role="dialog" aria-modal="true" aria-labelledby="intro-heading" hidden></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

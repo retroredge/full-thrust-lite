@@ -1,0 +1,21 @@
+{
+  "id": "battlecruiser",
+  "fleet": "red",
+  "className": "Battlecruiser",
+  "code": "BC",
+  "sprite": "ships/BC-red.png",
+  "length": 7.26,
+  "drives": [{ "thrust": 3 }, { "thrust": 3 }],
+  "hullRows": [7, 7, 6, 6],
+  "fireControls": 3,
+  "weapons": [
+    { "type": "pulseTorpedo", "arcs": ["FP", "F"] },
+    { "type": "pulseTorpedo", "arcs": ["F", "FS"] },
+    { "type": "beam", "class": 3, "arcs": ["FP", "F", "AP"] },
+    { "type": "beam", "class": 3, "arcs": ["F", "FS", "AS"] },
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 5, "weaponRows": [2, 2, 1, 2] }
+}
