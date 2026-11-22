@@ -4,6 +4,10 @@ A browser game of turn-based tactical starship combat, based on the free
 *Full Thrust Light* miniatures rules by Ground Zero Games. The **Rules**
 button in the toolbar opens the [published PDF](https://downloads.groundzerogames.co.uk/FT0916_UK.pdf).
 
+
+![Title screen](./docs/big-fleet-battle.png)
+
+
 How to play, and notes on the code, are in [docs/guide.md](docs/guide.md).
 
 ## Tech stack
