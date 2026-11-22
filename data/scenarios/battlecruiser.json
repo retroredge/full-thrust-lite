@@ -1,0 +1,31 @@
+{
+  "id": "battlecruiser",
+  "number": 2,
+  "name": "They have a Battle Cruiser",
+  "description": "Two cruisers with supporting destroyers run into a battle cruiser and some frigates.",
+  "players": [
+    {
+      "id": "p1",
+      "name": "Player One",
+      "colour": "#4cc27a",
+      "fleet": "green",
+      "ships": [
+        { "id": "DD1", "design": "destroyer", "name": "Arrow", "x": -30, "y": -15, "course": 3, "velocity": 6 },
+        { "id": "CL1", "design": "light-cruiser", "name": "Dauntless", "x": -31, "y": -5, "course": 3, "velocity": 6 },
+        { "id": "CH1", "design": "heavy-cruiser", "name": "Resolute", "x": -31, "y": 5, "course": 3, "velocity": 6 },
+        { "id": "DD2", "design": "destroyer", "name": "Javelin", "x": -30, "y": 15, "course": 3, "velocity": 6 }
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Player Two",
+      "colour": "#e8322b",
+      "fleet": "red",
+      "ships": [
+        { "id": "FF1", "design": "frigate", "name": "Kestrel", "x": 30, "y": -10, "course": 9, "velocity": 6 },
+        { "id": "BC1", "design": "battlecruiser", "name": "Invincible", "x": 32, "y": 0, "course": 9, "velocity": 6 },
+        { "id": "FF2", "design": "frigate", "name": "Merlin", "x": 30, "y": 10, "course": 9, "velocity": 6 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "big-fleet-battle",
+  "number": 3,
+  "name": "Big Fleet Battle",
+  "description": "Two battlecruiser fleets meet in deep space.",
+  "players": [
+    {
+      "id": "p1",
+      "name": "Player One",
+      "colour": "#4cc27a",
+      "fleet": "green",
+      "ships": [
+        { "id": "FF1", "design": "frigate", "name": "Kestrel", "x": -20, "y": -20, "course": 3, "velocity": 6 },
+        { "id": "DD1", "design": "destroyer", "name": "Arrow", "x": -20, "y": -10, "course": 3, "velocity": 6 },
+        { "id": "CH1", "design": "heavy-cruiser", "name": "Resolute", "x": -20, "y": 0, "course": 3, "velocity": 6 },
+        { "id": "DD2", "design": "destroyer", "name": "Javelin", "x": -20, "y": 10, "course": 3, "velocity": 6 },
+        { "id": "FF2", "design": "frigate", "name": "Merlin", "x": -20, "y": 20, "course": 3, "velocity": 6 },
+        { "id": "CL1", "design": "light-cruiser", "name": "Dauntless", "x": -30, "y": -10, "course": 3, "velocity": 6 },
+        { "id": "BC1", "design": "battlecruiser", "name": "Indomitable", "x": -30, "y": 0, "course": 3, "velocity": 6 },
+        { "id": "CL2", "design": "light-cruiser", "name": "Valiant", "x": -30, "y": 10, "course": 3, "velocity": 6 }
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Player Two",
+      "colour": "#e8322b",
+      "fleet": "red",
+      "ships": [
+        { "id": "FF3", "design": "frigate", "name": "Falcon", "x": 42.3, "y": 5.3, "course": 11, "velocity": 6 },
+        { "id": "DD3", "design": "destroyer", "name": "Lance", "x": 33.7, "y": 10.3, "course": 11, "velocity": 6 },
+        { "id": "CH2", "design": "heavy-cruiser", "name": "Implacable", "x": 25, "y": 15.3, "course": 11, "velocity": 6 },
+        { "id": "DD4", "design": "destroyer", "name": "Sabre", "x": 16.3, "y": 20.3, "course": 11, "velocity": 6 },
+        { "id": "FF4", "design": "frigate", "name": "Hobby", "x": 7.7, "y": 25.3, "course": 11, "velocity": 6 },
+        { "id": "CL3", "design": "light-cruiser", "name": "Ajax", "x": 38.7, "y": 19, "course": 11, "velocity": 6 },
+        { "id": "BC2", "design": "battlecruiser", "name": "Invincible", "x": 30, "y": 24, "course": 11, "velocity": 6 },
+        { "id": "CL4", "design": "light-cruiser", "name": "Achilles", "x": 21.3, "y": 29, "course": 11, "velocity": 6 }
+      ]
+    }
+  ]
+}

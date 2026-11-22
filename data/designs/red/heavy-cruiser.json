@@ -1,0 +1,20 @@
+{
+  "id": "heavy-cruiser",
+  "fleet": "red",
+  "className": "Heavy Cruiser",
+  "code": "CH",
+  "sprite": "ships/CH-red.png",
+  "length": 4.95,
+  "drives": [{ "thrust": 3 }, { "thrust": 3 }],
+  "hullRows": [5, 5, 4, 4],
+  "fireControls": 2,
+  "weapons": [
+    { "type": "pulseTorpedo", "arcs": ["F"] },
+    { "type": "beam", "class": 3, "arcs": ["FP", "F", "FS"] },
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "AP"] },
+    { "type": "beam", "class": 2, "arcs": ["F", "FS", "AS"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 4, "weaponRows": [2, 2, 2] }
+}

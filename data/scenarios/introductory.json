@@ -1,0 +1,29 @@
+{
+  "id": "introductory",
+  "number": 1,
+  "name": "Introductory Scenario",
+  "description": "Two frigates and a destroyer line up against two light cruisers.",
+  "players": [
+    {
+      "id": "p1",
+      "name": "Player One",
+      "colour": "#4cc27a",
+      "fleet": "green",
+      "ships": [
+        { "id": "FF1", "design": "frigate", "name": "Kestrel", "x": -16, "y": -10, "course": 3, "velocity": 6 },
+        { "id": "DD1", "design": "destroyer", "name": "Arrow", "x": -16, "y": -0, "course": 3, "velocity": 6 },
+        { "id": "FF3", "design": "frigate", "name": "Hobby", "x": -16, "y": 10, "course": 3, "velocity": 6 }
+      ]
+    },
+    {
+      "id": "p2",
+      "name": "Player Two",
+      "colour": "#e8322b",
+      "fleet": "red",
+      "ships": [
+        { "id": "CL1", "design": "light-cruiser", "name": "Dauntless", "x": 16, "y": -6, "course": 9, "velocity": 6 },
+        { "id": "CL2", "design": "light-cruiser", "name": "Valiant", "x": 16, "y": 6, "course": 9, "velocity": 6 }
+      ]
+    }
+  ]
+}

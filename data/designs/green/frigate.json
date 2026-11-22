@@ -1,0 +1,17 @@
+{
+  "id": "frigate",
+  "fleet": "green",
+  "className": "Frigate",
+  "code": "FF",
+  "sprite": "ships/FF-green.png",
+  "length": 2.025,
+  "drives": [{ "thrust": 3 }, { "thrust": 3 }],
+  "hullRows": [2, 2, 2, 1],
+  "fireControls": 1,
+  "weapons": [
+    { "type": "beam", "class": 3, "arcs": ["FP", "F", "FS"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 1, "weaponRows": [1, 2] }
+}

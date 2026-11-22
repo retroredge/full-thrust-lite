@@ -1,0 +1,18 @@
+{
+  "id": "destroyer",
+  "fleet": "red",
+  "className": "Destroyer",
+  "code": "DD",
+  "sprite": "ships/DD-red.png",
+  "length": 3,
+  "drives": [{ "thrust": 3 }, { "thrust": 3 }],
+  "hullRows": [3, 2, 2, 2],
+  "fireControls": 1,
+  "weapons": [
+    { "type": "beam", "class": 2, "arcs": ["FP", "F", "AP"] },
+    { "type": "beam", "class": 2, "arcs": ["F", "FS", "AS"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] },
+    { "type": "beam", "class": 1, "arcs": ["FP", "F", "FS", "AS", "AP"] }
+  ],
+  "ssd": { "size": 2, "weaponRows": [2, 2] }
+}
