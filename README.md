@@ -7,6 +7,7 @@ button in the toolbar opens the [published PDF](https://downloads.groundzerogame
 
 ![Title screen](./docs/big-fleet-battle.png)
 
+<h1 align="center"><a href="https://retroredge.github.io/full-thrust-lite/">▶ Play Game Here</a></h1>
 
 How to play, and notes on the code, are in [docs/guide.md](docs/guide.md).
 

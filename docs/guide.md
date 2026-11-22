@@ -299,6 +299,19 @@ The build works as a GitHub Pages project site
 `dist/` includes an empty `.nojekyll` file so GitHub Pages serves the files
 as they are rather than running them through Jekyll.
 
+This repo uses the `gh-pages` branch, served at
+<https://retroredge.github.io/full-thrust-lite/>. The branch holds only the
+built files. To publish a new build:
+
+```sh
+npm run build
+git worktree add ../ftl-pages gh-pages
+rm -rf ../ftl-pages/* && cp -R dist/. ../ftl-pages/
+git -C ../ftl-pages add -A && git -C ../ftl-pages commit -m "Publish game build"
+git -C ../ftl-pages push
+git worktree remove ../ftl-pages
+```
+
 ## Project layout
 
 | Path | Contents |
