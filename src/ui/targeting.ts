@@ -61,6 +61,8 @@ export interface TargetingOptions {
   onHullDamageShown(targetId: string, hullDamage: number): void;
   /** The player has finished targeting: cancelled, closed or continued. */
   onClose(): void;
+  /** The buttons have changed: a volley has started or finished, so the toolbar can follow. */
+  onActionsChanged(): void;
 }
 
 /**
@@ -175,17 +177,17 @@ export class Targeting {
 
     this.prevButton.addEventListener('click', () => {
       this.showTarget(this.current < 0 ? this.targets.length - 1 : this.current - 1);
-      this.fireButton.focus();
+      this.fireButton.focus({ preventScroll: true });
     });
     this.nextButton.addEventListener('click', () => {
       this.showTarget(this.current + 1);
-      this.fireButton.focus();
+      this.fireButton.focus({ preventScroll: true });
     });
     this.cancelButton.addEventListener('click', () => this.cancel());
     this.continueButton.addEventListener('click', () => this.cancel());
     this.nextTargetButton.addEventListener('click', () => {
       this.showTarget(0);
-      this.fireButton.focus();
+      this.fireButton.focus({ preventScroll: true });
     });
     this.fireButton.addEventListener('click', () => void this.fireVolley());
   }
@@ -193,7 +195,7 @@ export class Targeting {
   /** Shows the first target. Call once the caller is ready for `onTargetShown`. */
   start(): void {
     this.showTarget(this.current);
-    this.fireButton.focus();
+    this.fireButton.focus({ preventScroll: true });
   }
 
   /** True while the dice and damage are playing out; nothing else may happen then. */
@@ -218,7 +220,7 @@ export class Targeting {
       return false;
     }
     this.showTarget(index);
-    this.fireButton.focus();
+    this.fireButton.focus({ preventScroll: true });
     return true;
   }
 
@@ -261,6 +263,7 @@ export class Targeting {
     this.fireButton.hidden = mode !== 'aim';
     this.nextTargetButton.hidden = !(mode === 'result' && more);
     this.continueButton.hidden = !(mode === 'result' && !more);
+    this.options.onActionsChanged();
   }
 
   /** Shows the beam dice and the torpedoes chosen, each in its own pool, and whether Fire! can be pressed. */
@@ -579,9 +582,9 @@ export class Targeting {
       this.hint.textContent =
         `${this.options.shooter.id} has ${fcs} ${plural(fcs, 'fire control')} left. ` +
         'Press Next target (or click a highlighted ship) to fire again, or Close.';
-      this.nextTargetButton.focus();
+      this.nextTargetButton.focus({ preventScroll: true });
     } else {
-      this.continueButton.focus();
+      this.continueButton.focus({ preventScroll: true });
     }
     this.options.onTargetShown(volley.destroyed ? null : this.shown);
   }

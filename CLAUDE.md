@@ -78,8 +78,10 @@ their `fleet`.
   `playSample`. Credit any new clips under Credits in the README. The sound board
   (`src/ui/soundBoard.ts`) is temporary, for choosing sounds, and opens from the Debug popup. Pulse
   torpedoes use `kenney-digital/laser2.mp3`.
-- **Touch screens:** deferred. The known issues (touch targets, mostly) are
-  listed in `TODO.md`.
+- **Touch screens:** tablets in landscape only, never portrait. Touch sizes
+  (44 px controls, 16 px dropdown text) live in one `@media (pointer: coarse)`
+  block at the end of `src/style.css`; the desktop layout is unchanged.
+  Focus calls use `preventScroll`, since the page must never scroll.
 
 ## Checking in the browser
 

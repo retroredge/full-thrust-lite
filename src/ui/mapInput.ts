@@ -8,8 +8,8 @@ export interface MapInputHandlers {
   onPan(from: Vec2, to: Vec2): void;
   /** Zoom by `factor` about `point`, from a scroll, a trackpad pinch or a two-finger pinch. */
   onZoom(point: Vec2, factor: number): void;
-  /** A click (a press and release without dragging) at `point`. */
-  onClick(point: Vec2): void;
+  /** A click or tap (a press and release without dragging) at `point`; `touch` is true for a finger. */
+  onClick(point: Vec2, touch: boolean): void;
 }
 
 /**
@@ -83,7 +83,7 @@ export function bindMapInput(canvas: HTMLCanvasElement, signal: AbortSignal, han
     if (pointers.size === 0) {
       canvas.classList.remove('dragging');
       if (wasPressed && !dragged && event.type === 'pointerup') {
-        handlers.onClick(position(event));
+        handlers.onClick(position(event), event.pointerType === 'touch');
       }
       pressedAt = null;
     }

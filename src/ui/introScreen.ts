@@ -75,7 +75,7 @@ export function showIntro(overlay: HTMLElement, app: HTMLElement, entries: reado
   overlay.hidden = false;
   app.inert = true;
   // Focus the selected scenario so the arrow keys move through the list.
-  list.querySelector<HTMLInputElement>('input:checked')?.focus();
+  list.querySelector<HTMLInputElement>('input:checked')?.focus({ preventScroll: true });
 
   return new Promise((resolve) => {
     form.addEventListener('keydown', (event) => {

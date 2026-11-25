@@ -147,8 +147,10 @@ shrinks by the same amount.
   **dice pool** (how many dice will be rolled), **◀ Prev** and **Next ▶** to
   step through the other ships you could fire at (or click one on the map),
   and **Cancel** and **Fire!**. Fire! has focus whenever a target is shown,
-  so Enter or Space fires. Escape, or a click on anything else on the map,
-  also cancels. Once you fire, the pools disappear, the line reads e.g.
+  so Enter or Space fires. Escape, a click on anything else on the map, or
+  the toolbar's main button (which reads **Cancel targeting**) also cancels.
+  These buttons stay pinned to the bottom of the panel, so they are in view
+  however short the screen. Once you fire, the pools disappear, the line reads e.g.
   *Fired · 1 fire control left*, and the weapons that fired fade as fired
   when the dice are done.
 - The dice roll under the target's display: grey misses (1–3), amber 1
@@ -177,8 +179,10 @@ shrinks by the same amount.
   ship, the volley ends with **Close** and **Next target ▶**: Next target
   (or ◀ Prev / Next ▶, or a click on a highlighted ship) shows another
   target with **Fire!**, and **Close** stays on hand to stop, keeping what
-  was fired. Otherwise press **Continue**. Either way the target column
-  closes and the map widens again.
+  was fired. Otherwise press **Continue**. The toolbar's main button reads
+  **Continue** too after a volley (greyed out only while the dice roll), so
+  there is always a way on. Either way the target column closes and the map
+  widens again.
 - The Weapons fire panel lists each weapon's state: *ready*, *fired*,
   *nothing in reach*, *no fire control left* (an enemy is in reach but every
   fire control has been used), *target already fired at* (it only reaches
@@ -226,6 +230,13 @@ shrinks by the same amount.
 - The map has no edges: ships can fly as far as they like and are never
   removed for leaving the table. Positions are in mu, with 0,0 between the
   two fleets at the start.
+
+### Tablets
+
+The game plays on a tablet held in landscape (portrait isn't supported).
+Drag to pan, pinch to zoom and tap to select. On a touch screen every button
+and dropdown is at least 44 px, and a tap picks a ship a little further from
+its base ring than a mouse click does. Hover hints don't show on touch.
 
 ### Sound
 

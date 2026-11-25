@@ -6,8 +6,17 @@ export interface ToolbarContext {
   animating: boolean;
   /** The turn whose movement is being replayed, or null if no replay is playing. */
   replayTurn: number | null;
-  /** A firing ship has a target on show. */
-  targeting: boolean;
+  /** The targeting view, if it is open: whose ship is firing, whether it has fired yet, and whether the dice are rolling. */
+  targeting: TargetingStatus | null;
+}
+
+/** What the toolbar needs to know about an open targeting view. */
+export interface TargetingStatus {
+  shooterId: string;
+  /** At least one volley has been fired since the view opened. */
+  fired: boolean;
+  /** The dice and damage are playing out. */
+  busy: boolean;
 }
 
 /** The main action button: what it says, its tooltip, whether it can be pressed, and the player colour it takes. */
@@ -30,11 +39,13 @@ export interface Toolbar {
 /**
  * The toolbar for a moment in the game: the turn status and the main action
  * button, which locks in orders, starts the fire phase, passes or finishes a
- * ship, or ends the turn, depending on the phase.
+ * ship, or ends the turn, depending on the phase. While the targeting view is
+ * open the main button closes it, so it is never greyed out with nothing to
+ * say why: Cancel targeting before a volley, Continue after one.
  */
 export function buildToolbar(state: GameState, context: ToolbarContext): Toolbar {
   const phase = state.phase;
-  const busy = context.animating || context.targeting;
+  const busy = context.animating || context.targeting !== null;
   const over = phase.kind === 'gameOver';
   let activity: string;
   let main: Omit<MainButton, 'disabled'>;
@@ -90,6 +101,27 @@ export function buildToolbar(state: GameState, context: ToolbarContext): Toolbar
       break;
     default:
       return assertNever(phase);
+  }
+
+  const targeting = context.targeting;
+  if (targeting !== null && phase.kind === 'firing') {
+    main = targeting.fired
+      ? {
+          label: 'Continue',
+          title: `Close the targeting view, keeping what ${targeting.shooterId} has fired`,
+          colour: main.colour,
+        }
+      : {
+          label: 'Cancel targeting',
+          title: `Close the targeting view; ${targeting.shooterId} has not fired`,
+          colour: main.colour,
+        };
+    return {
+      turn: `Turn ${state.turn}`,
+      activity,
+      main: { ...main, disabled: targeting.busy },
+      resignDisabled: true,
+    };
   }
 
   if (context.replayTurn !== null) {

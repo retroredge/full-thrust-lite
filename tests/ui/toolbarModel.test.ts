@@ -3,7 +3,7 @@ import type { Phase } from '../../src/game/state';
 import { buildToolbar, type ToolbarContext } from '../../src/ui/toolbarModel';
 import { gameState } from '../support/gameState';
 
-const IDLE: ToolbarContext = { animating: false, replayTurn: null, targeting: false };
+const IDLE: ToolbarContext = { animating: false, replayTurn: null, targeting: null };
 const at = (phase: Phase, turn = 3) => gameState({ phase, turn });
 
 describe('buildToolbar', () => {
@@ -53,10 +53,32 @@ describe('buildToolbar', () => {
     expect(toolbar.main).toMatchObject({ label: 'Finish FF1', title: 'FF1 fires no more this turn, and play passes on' });
   });
 
-  it('disables the buttons while targeting', () => {
-    const toolbar = buildToolbar(at({ kind: 'firing', playerId: 'p1', activeShipId: null }), { ...IDLE, targeting: true });
-    expect(toolbar.main.disabled).toBe(true);
-    expect(toolbar.resignDisabled).toBe(true);
+  describe('while targeting', () => {
+    const firing = at({ kind: 'firing', playerId: 'p1', activeShipId: null });
+    const targeting = (fired: boolean, busy: boolean) => ({ ...IDLE, targeting: { shooterId: 'FF1', fired, busy } });
+
+    it('cancels targeting before a volley, in the firing player’s colour', () => {
+      const toolbar = buildToolbar(firing, targeting(false, false));
+      expect(toolbar.main).toEqual({
+        label: 'Cancel targeting',
+        title: 'Close the targeting view; FF1 has not fired',
+        disabled: false,
+        colour: '#4cc27a',
+      });
+      expect(toolbar.resignDisabled).toBe(true);
+    });
+
+    it('continues after a volley, so the turn can always go on', () => {
+      const toolbar = buildToolbar(firing, targeting(true, false));
+      expect(toolbar.main).toMatchObject({ label: 'Continue', disabled: false, colour: '#4cc27a' });
+      expect(toolbar.main.title).toBe('Close the targeting view, keeping what FF1 has fired');
+    });
+
+    it('is disabled while the dice roll', () => {
+      const toolbar = buildToolbar(firing, targeting(true, true));
+      expect(toolbar.main).toMatchObject({ label: 'Continue', disabled: true });
+      expect(toolbar.resignDisabled).toBe(true);
+    });
   });
 
   it('ends the turn once firing is over', () => {

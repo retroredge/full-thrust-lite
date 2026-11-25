@@ -2,38 +2,16 @@
 
 ## Touch screens
 
-Deferred. Not yet tried on a touch device. Text is already big enough: a CSS
-pixel is about the same physical size on a tablet as on a laptop, and the
-smallest text was raised for every device on 2026-11-18. What remains:
+Built 2026-11-25 for tablets in landscape (portrait isn't wanted), after a
+tester's iPad reports: 44 px controls and 16 px dropdown text under
+`@media (pointer: coarse)`, a wider tap margin for ships on touch, the page
+sized to Safari's visible height (`100dvh`), and focus that never scrolls the
+page. Checked in Chrome at iPad size only. Still open:
 
-1. **Small touch targets.** Measured on 2026-11-18, against the usual 44 px
-   (Apple's 44 pt, WCAG AAA):
-   - order dropdowns (thrust, turn amount): 35×25 and 43×25 px, and the
-     P / – / S turn buttons: 34×24 px, all used for every ship every turn;
-   - the targeting view's Prev / Next: 59×26 px (see also *Next target sits
-     where Fire! appears* below);
-   - toolbar buttons, including − and +: 30 px tall (30×30 px);
-   - Fire!, Cancel, Pass, Lock in orders, Prev ship / Next ship: 30 px tall;
-   - popup buttons (Begin, Lock in…): 34 px tall.
-
-   The scenario list rows (about 42 px) and SSD weapon icons (41–48 px) are
-   close enough. Fix: enlarge them to at least 44 px only on touch screens,
-   with `@media (pointer: coarse)`, leaving the desktop layout unchanged.
-2. **Dropdowns zoom the page on iOS.** Safari zooms in when a dropdown with
-   text under 16 px gets focus, and the order dropdowns are 13 px. Fix: 16 px
-   dropdown text in the same `@media (pointer: coarse)` block.
-3. **Ships are small to tap.** A tap or click picks a ship within 4 px of its
-   base ring, which is at least 13 px in radius, so about 34 px across; a
-   frigate is about 37 px across with all of Big Fleet Battle in view. Ships
-   on the same side are at least 120 px apart there, so the margin can grow
-   for touch alone (`pointerType === 'touch'` on the pointer event) without
-   picking the wrong ship (`pickShip` in `src/view/scene.ts`).
-4. **Hover tooltips don't exist on touch.** SSD icon tooltips (weapon arcs)
+1. **Try it on a real iPad.** Pinch-zoom, pan, the dropdowns and the fire
+   phase haven't been played on one since these fixes.
+2. **Hover tooltips don't exist on touch.** SSD icon tooltips (weapon arcs)
    and button hints won't show. Minor: players read the SSD itself.
-
-Already fine on touch: pan, pinch-zoom and tap-to-select on the map (pointer
-events, `touch-action: none`), native pickers for the order dropdowns, and
-swipe-scrolling the orders sheet.
 
 ## Game flow
 
@@ -89,3 +67,22 @@ Found in a play-through of scenario 1 on 2026-11-17.
     surviving on each side), no way to stay and look at the final board, and
     the map behind it is empty because the camera doesn't frame the
     survivors (`fitAllShips()` in `src/main.ts` may be all that needs).
+
+## Testing
+
+1. **End-to-end tests.** Every test is a Vitest unit test in Node; nothing
+   drives the real page, so bugs in `src/main.ts`, the DOM, CSS, focus and
+   scrolling go unseen (both iPad bugs of 2026-11-24/25 were there). Idea: a
+   small Playwright suite behind `npm run test:e2e`, kept out of `npm test`,
+   running desktop Chromium and a landscape iPad in WebKit (Safari's engine,
+   with touch):
+   - a full turn of the Introductory Scenario, plotting to End turn;
+   - the toolbar button while targeting: Cancel targeting, then Continue
+     after a volley, then End turn;
+   - on the iPad: the toolbar stays on screen and the page never scrolls,
+     Fire! and Continue are in view, no visible control is under 44 px, and
+     the Turn row fits on one line.
+
+   Dice are random, so tests either accept any result or need a test hook to
+   fix them (the game already passes `Math.random` in). Needs Playwright and
+   its browsers as dev dependencies, a few hundred MB.

@@ -8,6 +8,7 @@ import {
   pickShip,
   sizeClassOf,
   shipRadiusPx,
+  TOUCH_PICK_MARGIN_PX,
   type Scene,
   type SceneShip,
 } from '../../src/view/scene';
@@ -213,6 +214,16 @@ describe('pickShip', () => {
     const point = screenOf(scene, 'CH1');
     expect(pickShip(scene, point, camera, viewport, projection)?.id).toBe('CH1');
     expect(pickShip(scene, { x: point.x + 5, y: point.y - 5 }, camera, viewport, projection)?.id).toBe('CH1');
+  });
+
+  it('reaches further for a tap than for a click', () => {
+    const scene = buildScene(standardState());
+    const ship = scene.ships.find((candidate) => candidate.id === 'CH1')!;
+    const centre = screenOf(scene, 'CH1');
+    // 10 px outside the base ring, straight up: beyond a click's margin, within a tap's.
+    const point = { x: centre.x, y: centre.y - shipRadiusPx(ship, camera) - 10 };
+    expect(pickShip(scene, point, camera, viewport, projection)).toBeNull();
+    expect(pickShip(scene, point, camera, viewport, projection, TOUCH_PICK_MARGIN_PX)?.id).toBe('CH1');
   });
 
   it('returns null on empty space', () => {

@@ -159,20 +159,35 @@ export function shipRadiusPx(ship: SceneShip, camera: Camera): number {
   return Math.max(MIN_SHIP_RADIUS_PX, shipRadiusMu(ship.length) * camera.zoom);
 }
 
-/** The ship under a screen point, if any. The nearest ship wins when several overlap. */
+/** How far outside a ship's base ring, in pixels, a mouse click still picks it. */
+export const PICK_MARGIN_PX = 4;
+
+/**
+ * How far outside a ship's base ring, in pixels, a tap still picks it: a
+ * fingertip is far less exact than a mouse. Ships on the same side are at
+ * least 120 px apart with a whole fleet in view, and the nearest ship wins
+ * anyway, so this can't pick the wrong one.
+ */
+export const TOUCH_PICK_MARGIN_PX = 16;
+
+/**
+ * The ship under a screen point, if any, within `margin` pixels of its base
+ * ring. The nearest ship wins when several are in reach.
+ */
 export function pickShip(
   scene: Scene,
   screenPoint: Vec2,
   camera: Camera,
   viewport: Viewport,
   projection: Projection,
+  margin = PICK_MARGIN_PX,
 ): SceneShip | null {
   let best: SceneShip | null = null;
   let bestDistance = Infinity;
   for (const ship of scene.ships) {
     const centre = projection.worldToScreen(ship.position, camera, viewport);
     const distance = Math.hypot(centre.x - screenPoint.x, centre.y - screenPoint.y);
-    if (distance <= shipRadiusPx(ship, camera) + 4 && distance < bestDistance) {
+    if (distance <= shipRadiusPx(ship, camera) + margin && distance < bestDistance) {
       best = ship;
       bestDistance = distance;
     }

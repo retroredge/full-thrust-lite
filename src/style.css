@@ -41,7 +41,9 @@ body {
   grid-template-areas:
     'toolbar toolbar'
     'map side';
+  /* The visible height: on iPad Safari 100vh runs on under its toolbars, which hid the bottom of the side panel. */
   height: 100vh;
+  height: 100dvh;
 }
 
 h1,
@@ -304,7 +306,10 @@ tr:focus-visible {
 }
 
 .orders-panel {
-  flex: 0 0 auto;
+  /* On a short screen this scrolls rather than running off the bottom, and the targeting buttons stay pinned (below). */
+  flex: 0 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   border-top: 1px solid var(--line);
 }
 
@@ -410,6 +415,7 @@ tr:focus-visible {
  */
 .ssd-card svg {
   --ssd-room: max(240px, calc(100vh - 395px));
+  --ssd-room: max(240px, calc(100dvh - 395px));
   display: block;
   margin: 0 auto;
   width: auto;
@@ -888,6 +894,11 @@ tr:focus-visible {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
+  /* Pinned to the bottom of the panel, so Fire!, Close and Continue are always in view. */
+  position: sticky;
+  bottom: 0;
+  padding-top: 8px;
+  background: var(--panel);
 }
 
 /* Fire! (and Next target / Continue after a volley) takes focus as soon as a
@@ -1258,4 +1269,52 @@ tr:focus-visible {
 
 .sound-button {
   padding: 5px 10px;
+}
+
+/*
+ * Touch screens (tablets): every control a finger presses is at least 44 px,
+ * Apple's guideline, and dropdown text is 16 px so iOS Safari doesn't zoom the
+ * page when one is tapped. The desktop layout is unchanged.
+ */
+@media (pointer: coarse) {
+  button,
+  .button {
+    min-height: 44px;
+  }
+
+  /* Rules is a link drawn as a button: keep its text centred at the taller height. */
+  .button {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* − and +: square. */
+  .toolbar-group button {
+    min-width: 44px;
+  }
+
+  select,
+  .order-value select {
+    min-height: 44px;
+    min-width: 52px;
+    font-size: 16px;
+  }
+
+  /* Port / no turn / starboard. */
+  /* Narrow enough that the turn amount still fits beside them on one line. */
+  .segmented span {
+    min-width: 44px;
+    padding: 12px 0;
+    line-height: 20px;
+  }
+
+  /* Prev and Next ship, Prev and Next target: wide enough to hit without hitting the other. */
+  .fire-target-nav button {
+    min-width: 64px;
+  }
+
+  /* The bigger controls take more of the panel's height, so the ship display gives up a little more. */
+  .ssd-card svg {
+    --ssd-room: max(200px, calc(100dvh - 470px));
+  }
 }

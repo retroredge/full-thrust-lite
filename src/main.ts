@@ -41,7 +41,16 @@ import { OverheadProjection, type Projection } from './view/projection';
 import { createPlayback, isFinished, restart, tick, type Playback } from './view/playback';
 import type { BoardRenderer } from './view/renderer';
 import { buildFireEnvelope, type FireEnvelope } from './view/fireEnvelope';
-import { buildScene, pickShip, shipRadiusMu, type Scene, type SceneExplosion, type SceneTargetLine } from './view/scene';
+import {
+  buildScene,
+  PICK_MARGIN_PX,
+  pickShip,
+  shipRadiusMu,
+  TOUCH_PICK_MARGIN_PX,
+  type Scene,
+  type SceneExplosion,
+  type SceneTargetLine,
+} from './view/scene';
 import { enableSoundOnFirstGesture, playClick, setEngineSound } from './audio/sound';
 import { isLocalHost } from './ui/localHost';
 import { renderCourseClock } from './ui/courseClock';
@@ -265,8 +274,14 @@ class Game {
    * orders; once the ships have moved it starts the fire phase; during the
    * fire phase it passes the firing player's go, or finishes the ship they
    * are part-way through firing; and once firing is over it ends the turn.
+   * While the targeting view is open it closes it, as Cancel, Close or
+   * Continue there would.
    */
   private async mainAction(): Promise<void> {
+    if (this.targeting !== null && this.animation === null && !isDialogOpen()) {
+      this.targeting.controller.cancel();
+      return;
+    }
     if (this.animation !== null || this.targeting !== null || isDialogOpen()) {
       return;
     }
@@ -445,6 +460,11 @@ class Game {
         this.requestFrame();
       },
       onClose: () => void this.closeTargeting(),
+      onActionsChanged: () => {
+        if (this.targeting !== null) {
+          this.renderPanels();
+        }
+      },
     });
     const session: TargetingSession = { controller, shooterId: shooter.id, before, state: before, shown: before, fittedId: null };
     this.targeting = session;
@@ -651,7 +671,14 @@ class Game {
     const toolbar = buildToolbar(this.state, {
       animating: this.animation !== null,
       replayTurn: this.animation !== null && this.animation.next === null ? this.animation.before.turn : null,
-      targeting,
+      targeting:
+        this.targeting === null
+          ? null
+          : {
+              shooterId: this.targeting.shooterId,
+              fired: this.targeting.controller.fired,
+              busy: this.targeting.controller.busy,
+            },
     });
     const turn = document.createElement('strong');
     turn.textContent = toolbar.turn;
@@ -777,6 +804,18 @@ class Game {
       },
       { signal: this.listeners.signal },
     );
+    // The page never scrolls: the map pans instead. If the browser scrolls it
+    // anyway (on iPad Safari, bringing a focused button into view pushed the
+    // toolbar off the top, with no way back), put it straight back.
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (window.scrollX !== 0 || window.scrollY !== 0) {
+          window.scrollTo(0, 0);
+        }
+      },
+      { signal: this.listeners.signal },
+    );
   }
 
   /** Drag to pan, scroll or pinch to zoom, and click to pick a ship. */
@@ -790,8 +829,9 @@ class Game {
         this.view.zoomAt(point, factor);
         this.requestFrame();
       },
-      onClick: (point) => {
-        const picked = pickShip(this.scene, point, this.view.camera, this.renderer.viewport, this.projection);
+      onClick: (point, touch) => {
+        const margin = touch ? TOUCH_PICK_MARGIN_PX : PICK_MARGIN_PX;
+        const picked = pickShip(this.scene, point, this.view.camera, this.renderer.viewport, this.projection, margin);
         this.clickShip(picked?.id ?? null);
       },
     });
