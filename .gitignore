@@ -1,5 +1,9 @@
 node_modules
 dist
+
+# Playwright output
+test-results
+playwright-report
 .DS_Store
 
 # IDE settings

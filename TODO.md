@@ -6,7 +6,9 @@ Built 2026-11-25 for tablets in landscape (portrait isn't wanted), after a
 tester's iPad reports: 44 px controls and 16 px dropdown text under
 `@media (pointer: coarse)`, a wider tap margin for ships on touch, the page
 sized to Safari's visible height (`100dvh`), and focus that never scrolls the
-page. Checked in Chrome at iPad size only. Still open:
+page. Checked by the end-to-end tests in WebKit as an iPad, which found that
+Safari ignores `min-height` on dropdowns (they now have a fixed 44 px height).
+Still open:
 
 1. **Try it on a real iPad.** Pinch-zoom, pan, the dropdowns and the fire
    phase haven't been played on one since these fixes.
@@ -67,22 +69,3 @@ Found in a play-through of scenario 1 on 2026-11-17.
     surviving on each side), no way to stay and look at the final board, and
     the map behind it is empty because the camera doesn't frame the
     survivors (`fitAllShips()` in `src/main.ts` may be all that needs).
-
-## Testing
-
-1. **End-to-end tests.** Every test is a Vitest unit test in Node; nothing
-   drives the real page, so bugs in `src/main.ts`, the DOM, CSS, focus and
-   scrolling go unseen (both iPad bugs of 2026-11-24/25 were there). Idea: a
-   small Playwright suite behind `npm run test:e2e`, kept out of `npm test`,
-   running desktop Chromium and a landscape iPad in WebKit (Safari's engine,
-   with touch):
-   - a full turn of the Introductory Scenario, plotting to End turn;
-   - the toolbar button while targeting: Cancel targeting, then Continue
-     after a volley, then End turn;
-   - on the iPad: the toolbar stays on screen and the page never scrolls,
-     Fire! and Continue are in view, no visible control is under 44 px, and
-     the Turn row fits on one line.
-
-   Dice are random, so tests either accept any result or need a test hook to
-   fix them (the game already passes `Math.random` in). Needs Playwright and
-   its browsers as dev dependencies, a few hundred MB.

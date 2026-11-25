@@ -12,7 +12,6 @@ import {
   nebulaInTile,
   nebulaLevel,
   nebulaTileSize,
-  seededRandom,
   starLevel,
   starTileSize,
   starsInTile,
@@ -26,28 +25,6 @@ for (let x = -6; x <= 6; x += 1) {
     tiles.push([x, y]);
   }
 }
-
-describe('seededRandom', () => {
-  it('stays in [0, 1)', () => {
-    for (const seed of [0, 1, 42, 0xffffffff, -7]) {
-      const random = seededRandom(seed);
-      for (let index = 0; index < 2000; index += 1) {
-        const value = random();
-        expect(value).toBeGreaterThanOrEqual(0);
-        expect(value).toBeLessThan(1);
-      }
-    }
-  });
-
-  it('repeats the same sequence for the same seed and differs for another seed', () => {
-    const sample = (seed: number) => {
-      const random = seededRandom(seed);
-      return Array.from({ length: 20 }, () => random());
-    };
-    expect(sample(99)).toEqual(sample(99));
-    expect(sample(99)).not.toEqual(sample(100));
-  });
-});
 
 describe('starsInTile', () => {
   it('gives identical stars for the same tile and seed', () => {

@@ -58,9 +58,12 @@ Then open the address Vite prints (normally http://localhost:5173).
 ## Test
 
 ```sh
-npm test
+npm test           # unit tests
+npm run test:e2e   # end-to-end tests in real browsers
 npm run lint
 ```
+
+The end-to-end tests need Playwright's browsers once: `npx playwright install chromium webkit`.
 
 ## Credits
 

@@ -32,7 +32,9 @@ import { viewFor } from './game/visibility';
 import type { Vec2 } from './rules/course';
 import type { MoveResult } from './rules/movement';
 import type { Order } from './rules/orders';
+import type { Rng } from './rules/fire';
 import type { Ship } from './rules/ship';
+import { seededRandom, seedFromSearch } from './game/random';
 import { easeInOut, pathPoints, pathUpTo, poseAt, type AnimatedPose } from './view/animate';
 import type { Circle } from './view/camera';
 import { CameraController } from './view/cameraController';
@@ -147,10 +149,13 @@ class Game {
   /**
    * @param onMenu called when the players confirm they want to leave for the
    *   scenario list. The caller disposes the game.
+   * @param rng where the game's dice come from: Math.random, or a seeded
+   *   source in development so end-to-end tests roll the same every run.
    */
   constructor(
     private state: GameState,
     private readonly onMenu: () => void,
+    private readonly rng: Rng = Math.random,
   ) {
     this.renderer = new CanvasRenderer(this.canvas, this.projection, ASSETS_URL, () => this.requestFrame());
     this.view = new CameraController(this.projection, this.renderer, () => this.requestFrame());
@@ -295,7 +300,7 @@ class Game {
       case 'movementComplete':
         // Replaying the move from here on would bring destroyed ships back, so it ends now.
         this.lastMovement = null;
-        await this.enter(startFirePhase(previous, Math.random), previous);
+        await this.enter(startFirePhase(previous, this.rng), previous);
         break;
       case 'firing':
         await (phase.activeShipId === null ? this.passGo() : this.finishActiveShip());
@@ -433,7 +438,7 @@ class Game {
       shooterContainer: this.ssdContainer,
       controlsContainer: this.ordersContainer,
       fire: (chosenTargetId, weapons) => {
-        const result = fireVolley(session.state, shooter.id, chosenTargetId, weapons, Math.random);
+        const result = fireVolley(session.state, shooter.id, chosenTargetId, weapons, this.rng);
         const after = result.next;
         session.state = after;
         return {
@@ -587,6 +592,20 @@ class Game {
     if (leave && !this.disposed) {
       this.onMenu();
     }
+  }
+
+  /**
+   * Where a ship is drawn, in page pixels, or null if it isn't on the map.
+   * For end-to-end tests, which click or tap the map there like a player.
+   */
+  shipScreenPoint(shipId: string): Vec2 | null {
+    const ship = this.scene.ships.find((candidate) => candidate.id === shipId);
+    if (ship === undefined) {
+      return null;
+    }
+    const point = this.projection.worldToScreen(ship.position, this.view.camera, this.renderer.viewport);
+    const box = this.canvas.getBoundingClientRect();
+    return { x: box.left + point.x, y: box.top + point.y };
   }
 
   /** The game state and what the interface is doing, for the state dump in the About and Debug popups. */
@@ -1059,16 +1078,29 @@ let currentGame: Game | null = null;
 async function showMenuThenPlay(catalogue: Catalogue): Promise<void> {
   drawBackdrop();
   const entry = await showIntro(getElement('intro'), getElement('app'), catalogue.entries);
-  const game: Game = new Game(createGame(entry.scenario, catalogue.designs), () => {
-    game.dispose();
-    currentGame = null;
-    void showMenuThenPlay(catalogue);
-  });
+  // In development, `?seed=N` makes the dice repeatable, for end-to-end tests.
+  // Published builds always use Math.random, and leave the seeded source out.
+  const rng = import.meta.env.DEV ? devRandom() : Math.random;
+  const game: Game = new Game(
+    createGame(entry.scenario, catalogue.designs),
+    () => {
+      game.dispose();
+      currentGame = null;
+      void showMenuThenPlay(catalogue);
+    },
+    rng,
+  );
   currentGame = game;
   if (import.meta.env.DEV) {
     // Handy for poking at the game from the browser console during development.
     (window as unknown as { game: Game }).game = game;
   }
+}
+
+/** The dice for a development build: seeded from `?seed=N` if given, otherwise Math.random. */
+function devRandom(): Rng {
+  const seed = seedFromSearch(location.search);
+  return seed === null ? Math.random : seededRandom(seed);
 }
 
 /**

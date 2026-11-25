@@ -292,6 +292,30 @@ dice rolling, and where the map was looking (camera and map size). Its
 a published copy, where Debug is hidden, the About popup's **Copy game
 state** copies the same JSON.
 
+## Testing
+
+`npm test` runs the unit tests (Vitest, in Node): the rules, game state and
+the pure `*Model.ts` modules. `npm run test:e2e` runs the end-to-end tests
+(Playwright), which play the real game in two browsers: desktop Chromium,
+and a landscape iPad in WebKit, Safari's engine, with touch. They cover:
+- a whole turn of the Introductory Scenario, from plotting to End turn;
+- the toolbar button while targeting: Cancel targeting, greyed out while
+  the dice roll, then Continue;
+- on the iPad: every control at least 44 px, the Turn row on one line,
+  Fire! and the toolbar on screen while targeting, the page never scrolling
+  (even when it is taller than the window, as iPad Safari made it), and the
+  version in About.
+
+Run them before every push or publish. They start their own dev server on
+port 5174, so they don't clash with `npm run dev`. In development builds the
+page takes `?seed=N` for repeatable dice (`src/game/random.ts`), and
+`window.game.shipScreenPoint(id)` says where a ship is drawn, so the tests
+click or tap the map like a player. A failing test leaves a trace in
+`test-results/`; open it with `npx playwright show-trace <trace.zip>`.
+
+Playwright's WebKit is close to iPad Safari but not the same: it doesn't
+have Safari's toolbars. A real iPad is still the final check.
+
 ## Deploying
 
 `npm run build` writes the site to `dist/`. It is entirely client-side static
@@ -327,6 +351,12 @@ npm version patch --no-git-tag-version
 git commit -am "Version 0.0.3"
 ```
 
+Then run the end-to-end tests, and publish only if they all pass:
+
+```sh
+npm run test:e2e
+```
+
 Then build and publish:
 
 ```sh
@@ -354,6 +384,7 @@ git worktree remove ../ftl-pages
 | `src/text.ts` | Helpers for the English shown to players: lists ("A, B and C") and plurals |
 | `src/main.ts` | The `Game` class, which runs turns and ties the rules, view and panels together |
 | `tests/` | Vitest suites, mirroring `src/`; `tests/support/` has shared fixtures, including a `gameState()` builder |
+| `e2e/` | Playwright end-to-end tests (see *Testing*), with `helpers.ts` for playing like a player |
 | `tools/` | Scripts for reading the rules PDF, such as the weapon arcs |
 
 The game plane is flat 2D, measured in mu. The view goes through a

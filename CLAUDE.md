@@ -10,6 +10,7 @@ build and run it, `docs/guide.md` for how to play and the project layout, and
 ```sh
 npm run dev        # Vite dev server on http://localhost:5173
 npm test           # Vitest, the full suite
+npm run test:e2e   # Playwright: the real game in desktop Chromium and an iPad (WebKit)
 npm run typecheck  # tsc --noEmit
 npm run lint       # oxlint (type-aware) and a Prettier check
 npm run format     # Prettier: rewrite files in the house style
@@ -19,6 +20,14 @@ npm run build      # typecheck, lint, then build to dist/
 After every change, however small, run the typecheck and the full test suite,
 and make sure the build passes (it lints too) before calling the work done.
 Run `npm run format` before building if the Prettier check fails.
+
+**Always run `npm run test:e2e`, and see every test pass, before any push or
+publish to GitHub Pages.** If one fails, stop and report it; don't push. Run
+it too after changes to the UI, CSS or `src/main.ts`. It takes about a
+minute, which is why the build doesn't run it. The tests start their own dev
+server on port 5174 and use the development-only hooks: `window.game`
+(including `shipScreenPoint(id)`, to click or tap ships) and `?seed=N` for
+repeatable dice.
 
 Lint is oxlint, not ESLint: typescript-eslint can't read TypeScript 7, while
 oxlint's type-aware rules (`oxlint-tsgolint`) are built on it. Config is in

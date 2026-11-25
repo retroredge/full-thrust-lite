@@ -1,6 +1,6 @@
 {
   "name": "full-thrust-light",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,11 +8,13 @@
     "build": "tsc --noEmit && npm run lint && vite build",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "lint": "oxlint --type-aware src tests vite.config.ts && prettier --check .",
+    "lint": "oxlint --type-aware src tests e2e vite.config.ts playwright.config.ts && prettier --check .",
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "oxlint": "^1.94.0",
     "oxlint-tsgolint": "^7.0.2008",

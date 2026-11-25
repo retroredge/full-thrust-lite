@@ -1295,7 +1295,7 @@ tr:focus-visible {
 
   select,
   .order-value select {
-    min-height: 44px;
+    height: 44px;
     min-width: 52px;
     font-size: 16px;
   }
