@@ -1,6 +1,7 @@
 import type { GameState } from '../game/state';
 import { dumpFileName, dumpState, type DumpContext } from '../game/stateDump';
-import { announce, choose } from './dialog';
+import { copyGameState } from './copyState';
+import { choose } from './dialog';
 import { showSoundBoard } from './soundBoard';
 
 /**
@@ -37,33 +38,12 @@ export async function showDebugMenu(source: DebugSource | null): Promise<void> {
   if (choice === 'sfx') {
     showSoundBoard();
   } else if (source !== null && (choice === 'copy' || choice === 'save')) {
-    const savedAt = new Date();
-    const json = dumpState(source.state, source.context, savedAt);
     if (choice === 'copy') {
-      await copy(json);
+      await copyGameState(source.state, source.context, 'Debug');
     } else {
-      save(json, dumpFileName(source.state, savedAt));
+      const savedAt = new Date();
+      save(dumpState(source.state, source.context, savedAt), dumpFileName(source.state, savedAt));
     }
-  }
-}
-
-async function copy(json: string): Promise<void> {
-  try {
-    await navigator.clipboard.writeText(json);
-    await announce({
-      eyebrow: 'Debug',
-      title: 'Game state copied',
-      subtitle: `${Math.ceil(json.length / 1024)} KB of JSON is on the clipboard.`,
-      buttonLabel: 'OK',
-    });
-  } catch (error) {
-    console.error(error);
-    await announce({
-      eyebrow: 'Debug',
-      title: "Couldn't copy",
-      subtitle: 'The browser blocked the clipboard. Use Save state instead.',
-      buttonLabel: 'OK',
-    });
   }
 }
 

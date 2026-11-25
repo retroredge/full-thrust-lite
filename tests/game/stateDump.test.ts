@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseDesign, parseScenario } from '../../src/data/loader';
 import { createGame, type GameState } from '../../src/game/state';
 import { DUMP_FORMAT, DUMP_VERSION, dumpFileName, dumpState } from '../../src/game/stateDump';
+import { VERSION } from '../../src/version';
 
 const design = parseDesign(
   {
@@ -62,6 +63,7 @@ describe('dumpState', () => {
     const dump = JSON.parse(dumpState(state, context, savedAt));
     expect(dump.format).toBe(DUMP_FORMAT);
     expect(dump.version).toBe(DUMP_VERSION);
+    expect(dump.gameVersion).toBe(VERSION);
     expect(dump.savedAt).toBe(savedAt.toISOString());
     expect(dump.context).toEqual(context);
     expect(dump.state.designs).toEqual({ 'red/frigate': JSON.parse(JSON.stringify(design)) });

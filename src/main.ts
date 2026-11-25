@@ -62,6 +62,7 @@ import { announceInitiative } from './ui/initiativeDialog';
 import { announce, choose, confirm, isDialogOpen } from './ui/dialog';
 import { getElement } from './ui/dom';
 import { bindMapInput } from './ui/mapInput';
+import { showAbout } from './ui/aboutDialog';
 import { showDebugMenu, type DebugSource } from './ui/debugMenu';
 import { showIntro } from './ui/introScreen';
 import { renderOrderPanel } from './ui/orderPanel';
@@ -588,7 +589,7 @@ class Game {
     }
   }
 
-  /** The game state and what the interface is doing, for the Debug popup's state dump. */
+  /** The game state and what the interface is doing, for the state dump in the About and Debug popups. */
   debugSource(): DebugSource {
     return {
       state: this.state,
@@ -1093,6 +1094,7 @@ async function start(): Promise<void> {
       playClick();
     }
   });
+  getElement('about').addEventListener('click', () => void showAbout(currentGame?.debugSource() ?? null));
   // The Debug button is for development: only on this machine, never on a deployed copy.
   const debug = getElement('debug');
   if (isLocalHost(location.hostname)) {

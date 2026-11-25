@@ -78,6 +78,9 @@ their `fleet`.
   `playSample`. Credit any new clips under Credits in the README. The sound board
   (`src/ui/soundBoard.ts`) is temporary, for choosing sounds, and opens from the Debug popup. Pulse
   torpedoes use `kenney-digital/laser2.mp3`.
+- **Version:** set only in `package.json` (shown as e.g. *V0.0.2* in the
+  About popup and in state dumps as `gameVersion`, through `src/version.ts`). Raise it before every publish
+  to GitHub Pages; see *Deploying* in `docs/guide.md`.
 - **Touch screens:** tablets in landscape only, never portrait. Touch sizes
   (44 px controls, 16 px dropdown text) live in one `@media (pointer: coarse)`
   block at the end of `src/style.css`; the desktop layout is unchanged.

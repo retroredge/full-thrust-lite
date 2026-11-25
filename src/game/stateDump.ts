@@ -1,3 +1,4 @@
+import { VERSION } from '../version';
 import type { GameState } from './state';
 
 /** Identifies a game state dump, so a file can be recognised later. */
@@ -18,7 +19,8 @@ export interface DumpContext {
 
 /**
  * The whole game state as readable JSON, for passing on when something looks
- * wrong in a playtest. The designs map becomes a plain object keyed as before
+ * wrong in a playtest. `gameVersion` (e.g. "V0.0.2") says which build of the
+ * game it came from; `version` is the dump format's own. The designs map becomes a plain object keyed as before
  * (`red/frigate`), so nothing is lost.
  */
 export function dumpState(state: GameState, context: DumpContext, savedAt: Date): string {
@@ -26,6 +28,7 @@ export function dumpState(state: GameState, context: DumpContext, savedAt: Date)
     {
       format: DUMP_FORMAT,
       version: DUMP_VERSION,
+      gameVersion: VERSION,
       savedAt: savedAt.toISOString(),
       context,
       state: { ...state, designs: Object.fromEntries(state.designs) },

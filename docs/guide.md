@@ -16,7 +16,10 @@ the popup asks which side. It always asks first, with **Cancel** selected.
 The victory popup then says who resigned.
 
 **Rules** in the toolbar opens the *Full Thrust Light* rules PDF from Ground
-Zero Games in a new tab.
+Zero Games in a new tab. **About** shows the game's version (e.g. *V0.0.2*): ask
+a tester for it to know which build they are playing. During a game it also
+has **Copy game state**, which puts the game on the clipboard as JSON to paste
+into a bug report (the same dump as the Debug popup's).
 
 **Winning.** A side loses when it has no ships left in the battle, whether
 destroyed or gone. The map has no edges, so the rules' "a ship that leaves
@@ -284,7 +287,10 @@ localhost, opens a popup for development:
 The JSON holds every ship, the orders plotted so far, the fire phase, the
 log and the designs in play, plus what the interface was doing: the
 selected ship, the ship being targeted from, whether ships were moving or
-dice rolling, and where the map was looking (camera and map size).
+dice rolling, and where the map was looking (camera and map size). Its
+`gameVersion` (e.g. *V0.0.2*) says which build of the game it came from. On
+a published copy, where Debug is hidden, the About popup's **Copy game
+state** copies the same JSON.
 
 ## Deploying
 
@@ -312,7 +318,16 @@ as they are rather than running them through Jekyll.
 
 This repo uses the `gh-pages` branch, served at
 <https://retroredge.github.io/full-thrust-lite/>. The branch holds only the
-built files. To publish a new build:
+built files. To publish a new build, first raise the version, which the
+About popup shows. It is set only in `package.json`; `npm version` updates it
+and the lock file (use `minor` or `major` for bigger steps), then commit it:
+
+```sh
+npm version patch --no-git-tag-version
+git commit -am "Version 0.0.3"
+```
+
+Then build and publish:
 
 ```sh
 npm run build
